@@ -1,34 +1,46 @@
 import { View, Text,TouchableOpacity,StyleSheet} from 'react-native'
-import React ,{useState} from 'react';
+import React ,{useContext, useState} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
+import { TaskContext } from '../context/TaskContext';
 const Task = (props) => {
 
-  const [completeTask,setCompleteTask]=useState(
+  const {toDoList,setToDoList}=useContext(TaskContext);
+  const [taskState,setTaskState]=useState(
     {
       backgroundColor:'#fff',
       pressed:false
     }
    )
   
-  const ChangeColor = () =>{
-    if(!completeTask.pressed){
-     setCompleteTask({backgroundColor:'yellow',
+  const ChangeColor = (task) =>{
+    console.log('task',task)
+    if(!taskState.pressed){
+      setTaskState({backgroundColor:'green',
      pressed:true});
+     var Task ={
+      title:task,
+      isCompleted:true
     }
-     else {
-      setCompleteTask({backgroundColor:'#fff',
-      pressed:false});
+    let newTasks = [];
+    newTasks = [...toDoList,Task];
+    setToDoList(newTasks)
      }
+    else{
+      setTaskState({backgroundColor:'white',
+      pressed:false});
+    }
    }  
   return (
      <View style={styles.item}>
         <View style={styles.itemLeft}>
           <TouchableOpacity 
-            onPress={()=>ChangeColor()}
+            onPress={()=>{
+              ChangeColor(props.task)
+              props.handleDelete(props.position)
+            }}
             style={{
-              backgroundColor:completeTask.backgroundColor,
+              backgroundColor:taskState.backgroundColor,
               width:18,
               height:18,
               borderRadius:10,

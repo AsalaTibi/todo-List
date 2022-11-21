@@ -1,15 +1,25 @@
 import { StyleSheet, Text, TouchableOpacity, View ,TextInput} from 'react-native'
-import React,{useState} from 'react'
+import React,{useState,useContext} from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Task from './Task';
+import { TaskContext } from '../context/TaskContext';
 const TaskList = () => {
   
   const [task,setTask] = useState();
   const [taskItems,setTaskItems] = useState([]);
+  const {toDoList,setToDoList} = useContext(TaskContext);
  
   const handleAddTask = (task) => {
     setTaskItems([...taskItems,task])
+    
+    var Task ={
+      title:task,
+      isCompleted:false
+    }
+    let newTasks = [];
+    newTasks = [...toDoList,Task];
+    setToDoList(newTasks)
   }
 
   const deleteTask = (index) =>{
@@ -20,7 +30,7 @@ const TaskList = () => {
   
   return (
     <View style={styles.tasksWrapper}>
-        <Text style={styles.title}> Tasks </Text>
+        <Text style={styles.title}>Todos </Text>
         <View style={styles.items}>
            { 
              taskItems.map((item,index) => {
@@ -60,21 +70,22 @@ const styles = StyleSheet.create({
     tasksWrapper:{
         paddingTop:20,
         paddingHorizontal:20,
-        marginTop:20,
-        flex:1
+        // marginTop:15,
+        flex:1,
+        backgroundColor:'#FFF'
       },
       title:{
-        fontSize:24,
+        fontSize:26,
         fontWeight:'bold',
-        color:'black'
+        color:'#7F492F'
       },
       items:{
         marginTop:30
       },
       writeTask:{
         position:'absolute',
-        bottom:50,
-        marginHorizontal:20,
+        bottom:15,
+        marginHorizontal:25,
         width:'100%',
         flexDirection:'row',
         justifyContent:'center',
@@ -86,17 +97,17 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff',
         borderRadius:60,
         borderColor:'#EDE9E8',
-        borderWidth:1,
-        width:250
+        borderWidth:2,
+        width:250,
       },
       addWrapper:{
         width:60,
         height:60,
-        backgroundColor:'#CB997E',
+        backgroundColor:'#893F04',
         borderRadius:60,
         justifyContent:'center',
         alignItems:'center',
-        marginHorizontal:20
+        marginHorizontal:15
       },
       addText:{
         fontSize:18,
