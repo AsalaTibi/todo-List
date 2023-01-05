@@ -8,11 +8,12 @@ import {
 import { TaskContext } from '../context/TaskContext';
 import TaskList from '../components/TaskList';
 import MyTabs from './BottomNavigator';
-
+import { useSelector, useDispatch } from 'react-redux'
 const Drawer = createDrawerNavigator();
 
 const CustomDrawer = props => {
-  const { setIsLoggedIn,user } = useContext(TaskContext);
+  const { setIsLoggedIn } = useContext(TaskContext);
+  const user = useSelector((state)=> state.currentUser)
   return (
     <View style={{ flex: 1 }}>
       <DrawerContentScrollView {...props}>

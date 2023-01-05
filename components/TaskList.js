@@ -1,47 +1,112 @@
 import { StyleSheet, Text, TouchableOpacity, View ,TextInput} from 'react-native'
-import React,{useState,useContext} from 'react'
+import React,{useState,useContext, useEffect} from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Task from './Task';
 import { TaskContext } from '../context/TaskContext';
+import { connect } from "react-redux";
+import { addTodos,clearTodos,completeTask ,deleteT,initiateArr} from "../redux/reducer";
+import { useSelector, useDispatch } from 'react-redux'
+import{
+  getFirestore,collection,getDocs,query,where, onSnapshot,addDoc, doc, setDoc, updateDoc
+} from 'firebase/firestore'
+import firestore from '@react-native-firebase/firestore';
+
 const TaskList = () => {
-  
+
+  const arrayUsers = useSelector((state)=> state.allUsers)
+  const user = useSelector((state)=> state.currentUser)
+  const dispatch = useDispatch();
   const [task,setTask] = useState();
   const [taskItems,setTaskItems] = useState([]);
-  const {toDoList,setToDoList} = useContext(TaskContext);
- 
+  const [taskColor,setTaskColor]=useState('white');
+  const [load,setLoad] = useState(false);
+
+  const db =getFirestore()
+  const colRef = collection(db,'users')
+  const Ref = doc(db,'users',user.id)
+
+  useEffect(()=>{
+     console.log("hi")
+    const  q = query(colRef,where("email","==",user.email))
+    onSnapshot(q,(snapshot)=>{
+       
+      snapshot.docs.forEach((doc)=>{
+        
+        const dataI = doc.data();
+        const TaskArray = dataI.todos;
+        const size = Object.keys(arrayUsers).length;
+
+        if(load === false){
+          //  TaskArray.map((item,index) => {
+          //  //dispatch(addTodos(item))
+          //  })
+          setLoad(true);
+          dispatch(initiateArr(TaskArray))
+          console.log("array",TaskArray)
+          setTaskItems(TaskArray);
+        }
+    })
+  })
+  },[]);
+  
   const handleAddTask = (task) => {
-    setTaskItems([...taskItems,task])
-    
     var Task ={
       title:task,
-      isCompleted:false
+      completed:false,
     }
-    let newTasks = [];
-    newTasks = [...toDoList,Task];
-    setToDoList(newTasks)
-  }
+    dispatch(addTodos(Task))
+    const updateList = [...taskItems,Task]
+    console.log("add",taskItems)
+    updateDoc(Ref,{"todos":updateList})
+    setTaskItems(updateList)   
+   }
 
   const deleteTask = (index) =>{
-    let itemsCopy = [...taskItems];
-    itemsCopy.splice(index,1);
-    setTaskItems(itemsCopy)
+    dispatch(deleteT(index))
+    const updateList = [...taskItems];
+    updateList.splice(index,1);
+    updateDoc(Ref,{"todos":updateList})
+    setTaskItems(updateList)
   }
-  
+  const ChangeColor = (task) =>{
+     //dispatch(completeTask(task))
+    //  objIndex = taskItems.findIndex((obj => obj.title === task))
+    //  setTaskItems[objIndex].completed(true);
+    //  console.log("c:",taskItems)
+    //  const updateList = [...taskItems];
+    // updateDoc(Ref,{"todos":taskItems})
+    const newState = taskItems.map(obj => {
+      if(obj.title === task){
+        return{...obj,completed:true}
+      }
+      return obj;
+    })
+    const updateList = [...newState]
+    updateDoc(Ref,{"todos":updateList})
+    setTaskItems(newState);
+    initiateArr(newState)
+   }  
+
   return (
     <View style={styles.tasksWrapper}>
         <Text style={styles.title}>Todos </Text>
         <View style={styles.items}>
            { 
              taskItems.map((item,index) => {
-                console.log(item);
+              if(!item.completed){
                 return(
                   <Task 
                   handleDelete={deleteTask}
-                  task={item}
-                  position={index}/>
-                )
+                  handleComplete={ChangeColor}
+                  task={item.title}
+                  position={index}
+                  color={taskColor}
+                  key={index}
+                  />
+                )}
              })
+            
            }
         </View>
       <View style={styles.writeTask}>

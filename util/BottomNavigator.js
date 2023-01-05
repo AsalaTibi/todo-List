@@ -5,10 +5,13 @@ import TaskList from '../components/TaskList';
 import CompletedTask from '../components/CompletedTask';
 import { TaskContext } from '../context/TaskContext';
 import Users from '../components/Users';
+import { useSelector, useDispatch } from 'react-redux'
+
 const Tab = createBottomTabNavigator();
 
 export default function MyTabs() {
-  // const { user } = useContext(TaskContext);
+  const user = useSelector((state)=> state.currentUser)
+  
   return (
     <Tab.Navigator
      initialRouteName={'Add Tasks'}
@@ -57,7 +60,9 @@ export default function MyTabs() {
    >
       <Tab.Screen name="Add Tasks" component={TaskList} />
       <Tab.Screen name="Done" component={CompletedTask} />
-      <Tab.Screen name="Users" component={Users} />
+      {user.isAdmin ? 
+        <Tab.Screen name="Users" component={Users}/> : null
+      }
     </Tab.Navigator>
   );
 }

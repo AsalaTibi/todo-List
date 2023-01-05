@@ -1,20 +1,20 @@
 import { StyleSheet, Text, View ,TouchableOpacity} from 'react-native'
 import React, { useContext,useEffect,useState } from 'react'
 import { TaskContext } from '../context/TaskContext'
+import { useSelector, useDispatch } from 'react-redux'
 
 export default function CompletedTask() {
   
-  const {toDoList,setToDoList}=useContext(TaskContext);
-  const complete = [];
-
+  const arrayUsers = useSelector((state)=> state.allUsers)
   return (
     <View style={styles.tasksWrapper}>
     <Text style={styles.title}>Completed Task</Text>
     <View style={styles.items}>
     {
-    toDoList.map((item,index) => {
-     if(item.isCompleted){
-        console.log('item',item)
+    arrayUsers.map((item,index) => {
+      console.log('item',item)
+     if(item.completed){
+        // console.log('item',item)
        return(
         <View style={styles.item}>
         <View style={styles.itemLeft}>

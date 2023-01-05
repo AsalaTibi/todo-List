@@ -6,35 +6,27 @@ import { firebaseConfig } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { TaskContext } from '../context/TaskContext';
 import{
-  getFirestore,collection,getDocs
+  getFirestore,collection,getDocs,query,where, onSnapshot,addDoc
 } from 'firebase/firestore'
+import { addUser } from '../redux/reducer';
+import { useSelector, useDispatch } from 'react-redux'
 
 
 const Login = () => {
-  
+  const user = useSelector((state)=> state.currentUser)
+  const dispatch = useDispatch();
     const[email,setEmail] = useState('')
     const[password,setPassword] = useState('')
+    const[isAdmin,setIsAdmin]=useState(false)
    
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const navigation =useNavigation();
-    const { setIsLoggedIn,setUser } = useContext(TaskContext);
+    const { setIsLoggedIn} = useContext(TaskContext);
 
-  //   const db =getFirestore()
+    const db =getFirestore()
 
-  //  //collection ref
-  //   const colRef = collection(db,'users')
-
-  //  //get collection data
-  //   getDocs(colRef)
-  //  .then((snapshot)=>{
-  //    let users =[]
-  //    snapshot.docs.forEach((doc) =>{
-  //      users.push({...doc.data(),id:doc.id})
-  //    })
-  //    console.log(users)
-  //  })
-  
+   
     const setData = async () =>{
       if(email.length == 0 || password.length == 0){
         console.log('Please write your data');
@@ -43,15 +35,30 @@ const Login = () => {
         try {
           signInWithEmailAndPassword(auth,email,password)
           .then( userCredential => {
-           console.log('Logged in')
-           setIsLoggedIn(true)
-           var user = {
+            const colRef = collection(db,'users')
+            const  q = query(colRef,where("email","==",email))
+            onSnapshot(q,(snapshot)=>{
+       
+            snapshot.docs.forEach((doc)=>{
+        
+            const dataI = doc.data();
+            const v =dataI.isAdmin;
+            console.log(v);
+           
+          var user = {
               email:email,
-              password:password
+              password:password,
+              id:userCredential.user.uid,
+              isAdmin:v,
               }
-            setUser(user);
-
+        
+           dispatch(addUser(user))  
+           setIsLoggedIn(true)  
+        
+          })
         })
+          }
+        )
         .catch(error => {
           console.log(error)
           })
@@ -60,7 +67,6 @@ const Login = () => {
           console.log(error)
         }
     }
-   
      }
   return (
     <View style={styles.container}>
