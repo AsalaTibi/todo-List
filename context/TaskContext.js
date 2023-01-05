@@ -5,13 +5,13 @@ export const TaskContext = React.createContext();
 
 export const TaskProvider = ({children}) => {
   
-  const [toDoList,setToDoList]=useState([])
+  // const [toDoList,setToDoList]=useState([])
   const [isLoggedIn,setIsLoggedIn] = useState(false);
-  const [user,setUser]=useState([])
+  // const [user,setUser]=useState([])
    
     return (
     <TaskContext.Provider
-    value={{toDoList,setToDoList,isLoggedIn,setIsLoggedIn,user,setUser}}>
+    value={{isLoggedIn,setIsLoggedIn}}>
       {children}
     </TaskContext.Provider>
   );

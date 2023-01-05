@@ -8,16 +8,15 @@ import Login from './components/Login';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TaskContext } from './context/TaskContext';
 import DrawerNavigator from './util/DrawerNaviagtor';
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-     
       <Stack.Screen component={Login} name='Login' />
-      <Stack.Screen component={TaskList} name='TaskList' />
-      
     </Stack.Navigator>
   );
 };
@@ -33,10 +32,12 @@ export  const MainNavigator = () => {
 };
 export default function App() {
   return (
-    <TaskProvider>
+    <Provider store={store}>
+      <TaskProvider>
       <NavigationContainer >
         <MainNavigator />
       </NavigationContainer>
-    </TaskProvider>
+      </TaskProvider>
+    </Provider>
   );
 }
